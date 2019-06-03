@@ -4,7 +4,9 @@ author: "Andrew Edelblum, Kivalina Grove, and Ouafaa Hmaddi"
 date: "5/20/2019"
 output: html_document
 ---
-test
+
+Peer review note: Looks great, nice job! I just had a couple of thoughts which you can take or leave, it was clear to me as is for sure. Not sure if this is exactly required but I thought you might want to add just a brief text at the top of each chunk like introducing the data set, and then very basically explaining what it is that each chunk is accomplishing if that makes sense. I just know that looking at it as an outsider having context on where the data came from without needing to spend time exploring it, and also explainging the goal of each step would have made it easier to move through. Looks good though! 
+
 
 ```{r cleanup, include = FALSE}
 library(rio)
@@ -97,5 +99,28 @@ stat_calc <- function(data,
 		summarize_at(vars(!!enquo(outcome_var)),
 		             .funs)
 }
+```
+
+
+Peer review notes: See what you think but I wonder if you might want to consider rearranging your second function slightly possibly to be more along the lines of the function in the chunk I added below. I had just a couple of thoughts that may or may not be helpful. First, I thought you might want to include the check_args function as the first step in your second function (stat_calc). My thinking may not make sense but I had wondered if you end up with an error attempting to run data through your .funs list of opperations, for example if you had an error calculating the mean because your outcome variable was not numberic, I wonder if you would always makke it to the check_args list or not? Anyway I just had thought you might want to check that everything is as you want it to be before going through calculating the mean, sd, etc. Ssecond, this is up to you but I thought in some ways it might be easier to read if the check_args was one step, and then all the other pieces were clumped together. Instead of having .funs and then having a second piece where you do group_by and summarize. This just felt maybe slightly easier to read to me,  you can see if it works for you. The way you have it organized already was clear to me as well. Also I wondered if you wanted to add a piece where you actually run the function on your data, example "stat_calc(data, group_var, outcome_var)", so you could see it working. Great job! 
+```{r, include = FALSE}
+
+
+stat_calc <- function(data, group_var, outcome_var){
+                     group_var <- enquo(group_var) 
+                      outcome_var <- enquo(outcome_var)
+  
+  
+  data %>%
+    check_args(data, (!!group_var), (!!outcome_var))%>%
+		group_by(!!group_var) %>%
+    summarize(mean = mean(!!outcome_var, na.rm = TRUE),
+              sd = sd(!!outcome_var, na.rm = TRUE), 
+              min = min(!!outcome_var, na.rm = TRUE), 
+              max = max(!!outcome_var, na.rm = TRUE))
+}
+
+#stat_calc(data, group_var, outcome_var)
+#stat_calc(d, state, pledge)
 ```
 
